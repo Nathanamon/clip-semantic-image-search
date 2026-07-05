@@ -1,6 +1,6 @@
-streamlit>=1.30
-torch>=2.1,<2.6
-transformers>=4.36,<4.45
-faiss-cpu>=1.7.4
-pillow>=10.0
-numpy<2.0
+streamlit
+torch
+transformers
+faiss-cpu
+pillow
+numpy
