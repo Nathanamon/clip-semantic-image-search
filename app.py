@@ -45,7 +45,18 @@ def load_index_and_metadata():
 def encode_query(text: str, model, processor, device) -> np.ndarray:
     inputs = processor(text=[text], return_tensors="pt", padding=True).to(device)
     embed = model.get_text_features(**inputs)
-    embed = embed / embed.norm(p=2, dim=-1, keepdim=True)
+
+    # Selon la version de `transformers`, get_text_features peut renvoyer soit un
+    # tensor brut, soit un objet avec un attribut .text_embeds / .pooler_output.
+    if not isinstance(embed, torch.Tensor):
+        for attr in ("text_embeds", "pooler_output"):
+            if hasattr(embed, attr):
+                embed = getattr(embed, attr)
+                break
+
+    embed = embed.float()
+    norm = torch.linalg.norm(embed, dim=-1, keepdim=True)
+    embed = embed / norm
     return embed.cpu().numpy().astype("float32")
 
 
